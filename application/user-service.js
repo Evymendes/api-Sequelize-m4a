@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 const { User } = require('../models');
 
 module.exports = class Users {
@@ -7,12 +7,14 @@ module.exports = class Users {
   }
 
   expose() {
-    this.buscar();
-    this.abelhaEmel();
-    this.pescoco();
+    this.getUsersAll();
+    this.getUsers();
+    this.createdUser();
+    this.update();
+    this.delete();
   }
 
-  buscar() {
+  getUsersAll() {
     this.router.get('/users', (req, res) => {
       User.findAll()
         .then(users => {
@@ -24,7 +26,19 @@ module.exports = class Users {
     });
   }
 
-  abelhaEmel() {
+  getUsers() {
+    this.router.get('/users/:id', (req, res) => {
+      User.find({ where: { id: req.params.id } })
+        .then(users => {
+          res.json(users)
+        })
+        .catch(err => {
+          res.json(err)
+        })
+    })
+  }
+
+  createdUser() {
     this.router.post('/users', (req, res) => {
       User.create(req.body)
         .then(users => {
@@ -33,17 +47,32 @@ module.exports = class Users {
         .catch(err => {
           res.json(err)
         })
+    })
+  }
+
+  update() {
+    this.router.put('/users/:id', (req, res) => {
+      User.find({ where: { id: req.params.id } })
+        .then(user => {
+          return user.updateAttributes(req.body)
+            .then(response => {
+              res.json(response)              
+            })
+        })
+        .catch(error => {
+          res.json(error)
+        })
     });
   }
 
-  pescoco() {
-    this.router.post('/users/:id', (req, res) => {
-      User.find({ where: { id: req.params.id } })
+  delete() {
+    this.router.delete('/users/:id', (req, res) => {
+      User.destroy({ where: { id: req.params.id } })
         .then(users => {
-          res.json(users)
+          res.json({Resposta: "Deletado"})
         })
-        .catch(err => {
-          res.json(err)
+        .catch(error => {
+          res.json(error)
         })
     });
   }
